@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-cM_Ver = "v0.1-beta"  # Initial release
+#  Ver = "v0.1-beta"  # Initial release
+cM_Ver = "v0.2-beta"  # User input poofing
 
 """ ChordMaps.py chord map utility for stringed musical instruments.
     Copyright (C) 2019 David Murray
@@ -421,9 +422,19 @@ def printFretboard():
     # cstring1
     if save2csv is True:
         fn.write("|")
-        fn.write(tuning[0])
+        #  v0.2 show capo'd tuning
+        if capo == 0:
+            fn.write(tuning[0])
+        else:
+            k = 0
+            n = 0
+            while k < len(dia):
+                if tuning[0] == dia[k][0]:
+                    n = k
+                k = k + 1
+            fn.write(str(dia[n][capo]))
         fn.write("|")
-    else:
+    else:  # displa not updated for capo
         print("|", tuning[0], "|", end=' ')
     i = capo
     while i < maxCreate:
@@ -441,9 +452,19 @@ def printFretboard():
     # cstring2
     if save2csv is True:
         fn.write("|")
-        fn.write(tuning[1])
+        #  v0.2 show capo'd tuning
+        if capo == 0:
+            fn.write(tuning[1])
+        else:
+            k = 0
+            n = 0
+            while k < len(dia):
+                if tuning[1] == dia[k][0]:
+                    n = k
+                k = k + 1
+            fn.write(str(dia[n][capo]))
         fn.write("|")
-    else:
+    else:  # displa not updated for capo
         print("|", tuning[1], "|", end=' ')
     i = capo
     while i < maxCreate:
@@ -461,9 +482,19 @@ def printFretboard():
     # cstring3
     if save2csv is True:
         fn.write("|")
-        fn.write(tuning[2])
+        #  v0.2 show capo'd tuning
+        if capo == 0:
+            fn.write(tuning[2])
+        else:
+            k = 0
+            n = 0
+            while k < len(dia):
+                if tuning[2] == dia[k][0]:
+                    n = k
+                k = k + 1
+            fn.write(str(dia[n][capo]))
         fn.write("|")
-    else:
+    else:  # displa not updated for capo
         print("|", tuning[2], "|", end=' ')
     i = capo
     while i < maxCreate:
@@ -481,9 +512,19 @@ def printFretboard():
     # cstring4
     if save2csv is True:
         fn.write("|")
-        fn.write(tuning[3])
+        #  v0.2 show capo'd tuning
+        if capo == 0:
+            fn.write(tuning[3])
+        else:
+            k = 0
+            n = 0
+            while k < len(dia):
+                if tuning[3] == dia[k][0]:
+                    n = k
+                k = k + 1
+            fn.write(str(dia[n][capo]))
         fn.write("|")
-    else:
+    else:  # displa not updated for capo
         print("|", tuning[3], "|", end=' ')
     i = capo
     while i < maxCreate:
@@ -508,9 +549,19 @@ def printFretboard():
         # cstring5
         if save2csv is True:
             fn.write("|")
-            fn.write(tuning[4])
+            #  v0.2 show capo'd tuning
+            if capo == 0:
+                fn.write(tuning[4])
+            else:
+                k = 0
+                n = 0
+                while k < len(dia):
+                    if tuning[4] == dia[k][0]:
+                        n = k
+                    k = k + 1
+                fn.write(str(dia[n][capo]))
             fn.write("|")
-        else:
+        else:  # displa not updated for capo
             print("|", tuning[4], "|", end=' ')
         i = capo
         while i < maxCreate:
@@ -528,9 +579,19 @@ def printFretboard():
         # cstring6
         if save2csv is True:
             fn.write("|")
-            fn.write(tuning[5])
+            #  v0.2 show capo'd tuning
+            if capo == 0:
+                fn.write(tuning[5])
+            else:
+                k = 0
+                n = 0
+                while k < len(dia):
+                    if tuning[5] == dia[k][0]:
+                        n = k
+                    k = k + 1
+                fn.write(str(dia[n][capo]))
             fn.write("|")
-        else:
+        else:  # displa not updated for capo
             print("|", tuning[5], "|", end=' ')
         i = capo
         while i < maxCreate:
@@ -543,6 +604,8 @@ def printFretboard():
         if save2csv is True:
             fn.write("\n")
             print("Results written to", filename)
+            if capo > 0:  # v0.2
+                print("Results show tuning as capo tuning.")
             fn.close()
         else:
             print("")
@@ -608,6 +671,9 @@ while int(x) < 1 or int(x) > 6:
     print("Instrument type (1=ukulele, 2=baritone", end=' ')
     print("3=tenor banjo, 4=banjo, 5=mandolin, 6=guitar)?", end=' ')
     x = input() or '9'
+    #  v0.2 catch alpha input
+    if x.isalpha():
+        x = 9
 instType = int(x)
 # set defaults
 if instType == 1:
@@ -637,7 +703,11 @@ if helpOn is True:
 capo = 12
 while capo > 11:
     x = input("Capo (0=none(default) or fret number)?") or '0'
-    capo = int(x)
+    #  v0.2 catch alpha input
+    if x.isalpha():
+        capo = 12
+    else:
+        capo = int(x)
 maxFret = 15 + capo
 
 #
