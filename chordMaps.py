@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 #  Ver = "v0.1-beta"  # Initial release
-cM_Ver = "v0.2-beta"  # User input poofing
+#  Ver = "v0.2-beta"  # User input poofing,
+#                     # add feature, print to csv shows capo tuning
+cM_Ver = "v0.3-beta"  # enharmonic bug fix,
+#                     # missing last column bug fix,
+#                     # add feature, can print pentatonic scale
+
+
 
 """ ChordMaps.py chord map utility for stringed musical instruments.
     Copyright (C) 2019 David Murray
@@ -50,9 +56,11 @@ instType = 1
 capo = 0  # fret number goes her if capo
 maxFret = 27  # must not be changed to greater than 22, will throw error
 chordTonic = 'C'
-chordType = 5  # 0x0 = power chord, 0x1 = maj, 0x2 = min, 0x4 = 7th
+chordType = 5  # 0x0 = power, 0x1 = maj, 0x2 = min, 0x4 = 7th, 0x8 = pent
 chordNotes = ['', '', '', '']
 chordNotesEn = ['', '', '', '']  # For fretboard map search
+pentNotes = ['', '', '', '', '']
+pentNotesEn = ['', '', '', '', '']
 save2csv = True
 chordName = 'C'
 
@@ -272,11 +280,11 @@ def CreateUke():
             string6[i] = dia[x6][i % 12]
         i = i + 1
 
-
 def findChordNotes():
     """
     Finds notes for selected chord only.
     """
+    global chordNotes
     global chordNotesEn
     chordNotesEn = ['', '', '', '']
     x = i = 0
@@ -284,13 +292,13 @@ def findChordNotes():
         if dia[i][0] == chordTonic:
             x = i
         i = i + 1
-    chordNotes[0] = dia[x][0]       # tonic
-    if chordType & 0x1 == 1:         # major?
+    chordNotes[0] = dia[x][0]
+    if chordType & 0x1 == 1:
         chordNotes[1] = dia[x][4]
-    if chordType & 0x2 == 2:         # minor?
+    if chordType & 0x2 == 2:
         chordNotes[1] = dia[x][3]
-    chordNotes[2] = dia[x][7]       # perfect 5th
-    if chordType & 0x4 == 4:         # 7?
+    chordNotes[2] = dia[x][7]
+    if chordType & 0x4 == 4:
         chordNotes[3] = dia[x][10]
     else:
         chordNotes[3] = ''
@@ -298,7 +306,7 @@ def findChordNotes():
     # Enharmonic alternates
     #
     i = 0
-    while i < len(enh):
+    while i < 5:  # v0.3 enharmonic bug fix
         if chordNotes[0] == enh[0][i]:
             chordNotesEn[0] = enh[1][i]
         if chordNotes[0] == enh[1][i]:
@@ -317,6 +325,50 @@ def findChordNotes():
             chordNotesEn[3] = enh[0][i]
         i = i + 1
 
+def findPentNotes():  # Feature added in v0.3
+    """
+    Finds notes for selected pentatonic scale.
+    """
+    global pentNotes
+    global pentNotesEn
+    pentNotesEn = ['', '', '', '', '']
+    x = i = 0
+    while i < len(dia):
+        if dia[i][0] == chordTonic:  # use chordTonic
+            x = i
+        i = i + 1
+    pentNotes[0] = dia[x][0]
+    pentNotes[1] = dia[x][2]
+    pentNotes[2] = dia[x][4]
+    pentNotes[3] = dia[x][7]
+    pentNotes[4] = dia[x][9]
+    #
+    # Enharmonic alternates
+    #
+    i = 0
+    while i < 5:
+        if pentNotes[0] == enh[0][i]:
+            pentNotesEn[0] = enh[1][i]
+        if pentNotes[0] == enh[1][i]:
+            pentNotesEn[0] = enh[0][i]
+        if pentNotes[1] == enh[0][i]:
+            pentNotesEn[1] = enh[1][i]
+        if pentNotes[1] == enh[1][i]:
+            pentNotesEn[1] = enh[0][i]
+        if pentNotes[2] == enh[0][i]:
+            pentNotesEn[2] = enh[1][i]
+        if pentNotes[2] == enh[1][i]:
+            pentNotesEn[2] = enh[0][i]
+        if pentNotes[3] == enh[0][i]:
+            pentNotesEn[3] = enh[1][i]
+        if pentNotes[3] == enh[1][i]:
+            pentNotesEn[3] = enh[0][i]
+        if pentNotes[4] == enh[0][i]:
+            pentNotesEn[4] = enh[1][i]
+        if pentNotes[4] == enh[1][i]:
+            pentNotesEn[4] = enh[0][i]
+        i = i + 1
+
 
 def fillChordFretboard():
     """
@@ -333,7 +385,8 @@ def fillChordFretboard():
     #
     # clear Chord Fretboard map
     #
-    while z < maxFret:
+    maxCreate = maxFret + 1  # v0.3 missing last col data bug fix
+    while z < maxCreate:
         if instType == 6:
             cstring6[z] = ' '
             cstring5[z] = ' '
@@ -346,7 +399,7 @@ def fillChordFretboard():
     # Build map
     #
     i = capo
-    while i < maxFret:
+    while i < maxCreate:
         while j < len(chordNotes):
             if instType == 6:
                 if string6[i] == chordNotes[j]:
@@ -378,6 +431,67 @@ def fillChordFretboard():
         i = i + 1
 
 
+def fillPentFretboard():
+    """
+    Fills fretboard array with notes for selected pentatonic scale.
+    """
+    global maxFret
+    global cstring6
+    global cstring5
+    global cstring4
+    global cstring3
+    global cstring2
+    global cstring1
+    i = j = k = z = 0
+    #
+    # clear Chord Fretboard map
+    #
+    maxCreate = maxFret + 1  # v0.3 max column bug fix
+    while z < maxCreate:
+        if instType == 6:
+            cstring6[z] = ' '
+            cstring5[z] = ' '
+        cstring4[z] = ' '
+        cstring3[z] = ' '
+        cstring2[z] = ' '
+        cstring1[z] = ' '
+        z = z + 1
+    #
+    # Build map
+    #
+    i = capo
+    while i < maxCreate:
+        while j < len(pentNotes):
+            if instType == 6:
+                if string6[i] == pentNotes[j]:
+                    cstring6[i] = pentNotes[j]
+                if string6[i] == pentNotesEn[j]:
+                    cstring6[i] = pentNotes[j]
+                if string5[i] == pentNotes[j]:
+                    cstring5[i] = pentNotes[j]
+                if string5[i] == pentNotesEn[j]:
+                    cstring5[i] = pentNotes[j]
+            if string4[i] == pentNotes[j]:
+                cstring4[i] = pentNotes[j]
+            if string4[i] == pentNotesEn[j]:
+                cstring4[i] = pentNotes[j]
+            if string3[i] == pentNotes[j]:
+                cstring3[i] = pentNotes[j]
+            if string3[i] == pentNotesEn[j]:
+                cstring3[i] = pentNotes[j]
+            if string2[i] == pentNotes[j]:
+                cstring2[i] = pentNotes[j]
+            if string2[i] == pentNotesEn[j]:
+                cstring2[i] = pentNotes[j]
+            if string1[i] == pentNotes[j]:
+                cstring1[i] = pentNotes[j]
+            if string1[i] == pentNotesEn[j]:
+                cstring1[i] = pentNotes[j]
+            j = j + 1
+        j = 0
+        i = i + 1
+
+
 def printFretboard():
     """
     Writes the chord fretboard to a comman delimited file
@@ -392,14 +506,15 @@ def printFretboard():
 
     # calculate chord name
     chordName = chordNotes[0]
-    if chordType & 0x3 == 0:
-        chordName = chordName + '5'
-    if chordType & 0x1 == 1:
-        chordName = chordName
-    if chordType & 0x2 == 2:
-        chordName = chordName + 'm'
-    if chordType & 0x4 == 4:
-        chordName = chordName + '7'
+    if chordType != 8:
+        if chordType & 0x3 == 0:
+            chordName = chordName + '5'
+        if chordType & 0x1 == 1:
+            chordName = chordName
+        if chordType & 0x2 == 2:
+            chordName = chordName + 'm'
+        if chordType & 0x4 == 4:
+            chordName = chordName + '7'
 
     # fret number
     if save2csv is True:
@@ -616,7 +731,7 @@ def printFretboard():
 
 
 print("")
-print("    chordMaps.py  Copyright (C) 2019  David Murray")
+print("    chordMaps.py  Copyright (C) 2019  David Murray", cM_Ver)
 print("    This program comes with ABSOLUTELY NO WARRANTY;")
 print("    for details see GPLv3 or later.")
 print("    This is free software, and you are welcome to redistribute it")
@@ -635,8 +750,6 @@ if x == 'Y' or x == 'y':
 # instType
 #
 if helpOn is True:
-    print("")
-    print("chordMaps.py", cM_Ver)
     print("")
     print("Type 1: Ukulele: soprano, concert & baritone. No", end=' ')
     print("distinction for high-G vs. low-G strings.")
@@ -766,35 +879,42 @@ while looping is True:
     while chordTonic == 'z':
         x = input("Chord tonic/root note (case sensitive)?") or 'z'
         chordTonic = x
+    chordNotes[0] = chordTonic  # this is for pentatonic
 #
 # chord type
 #
     if helpOn is True:
         print("")
         print("Major=1-M3-5, minor=1-b3-5, power chord=1-5 (no 3rd,", end=' ')
-        print("neither major or minor)")
+        print("neither major or minor), pent=pentatonic scale.")
         print("")
 
     chordType = 9
     while chordType == 9:
-        x = input("Chord type (1=major, 2=minor, 0=power chord)?") or '9'
+        print("Chord type (0=pwr chord, 1=major, 2=minor, 8=pent)?", end=' ')
+        x = input() or '9'
         chordType = int(x)
-
-    if chordType != 0:
-        if helpOn is True:
-            print("")
-            print("7 chord=1-3-5-b7")
-            print("")
-
-        x = 'z'
-        while x == '7' or (x != 'Y' and x != 'y' and x != 'N' and x != 'n'):
-            x = input("Add 7th to chord (N or y)?") or 'N'
-        if str.upper(x) == 'Y':
-            chordType = chordType | 4
+        if chordType != 0 and chordType != 1 and chordType != 2 and chordType != 8:
+            chordType = 9
+    if chordType != 8:
+        if chordType != 0:
+            if helpOn is True:
+                print("")
+                print("7 chord=1-3-5-b7")
+                print("")
+            x = 'z'
+            while x == '7' or (x.upper() != 'Y' and x.upper() != 'N'):
+                x = input("Add 7th to chord (N or y)?") or 'N'
+            if str.upper(x) == 'Y':
+                chordType = chordType | 4
 
     CreateUke()
-    findChordNotes()
-    fillChordFretboard()
+    if chordType < 8:
+        findChordNotes()
+        fillChordFretboard()
+    else:
+        findPentNotes()
+        fillPentFretboard()
 #    print ("Chord", chordNotes)
 
 #
@@ -806,15 +926,18 @@ while looping is True:
     else:
         filename = tuning[3] + tuning[2] + tuning[1] + tuning[0]
     filename = filename + "_" + str(capo) + "_" + chordNotes[0]
-    if chordNotes[1] == '':
-        filename = filename + '-'
+    if chordType == 8:
+        filename = filename + "-pent"
     else:
-        filename = filename + chordNotes[1]
-    filename = filename + chordNotes[2]
-    if chordNotes[3] == '':
-        filename = filename + '-'
-    else:
-        filename = filename + chordNotes[3]
+        if chordNotes[1] == '':
+            filename = filename + '-'
+        else:
+            filename = filename + chordNotes[1]
+        filename = filename + chordNotes[2]
+        if chordNotes[3] == '':
+            filename = filename + '-'
+        else:
+            filename = filename + chordNotes[3]
     filename = filename + '.csv'
 
     if helpOn is True:
