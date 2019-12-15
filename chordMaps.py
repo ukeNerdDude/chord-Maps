@@ -2,9 +2,8 @@
 #  Ver = "v0.1-beta"  # Initial release
 #  Ver = "v0.2-beta"  # User input poofing,
 #                     # add feature, print to csv shows capo tuning
-cM_Ver = "v0.3-beta"  # enharmonic bug fix,
-#                     # missing last column bug fix,
-#                     # add feature, can print pentatonic scale
+#  Ver = "v0.3-beta"  # enharmonic bug fix,
+cM_Ver = "v0.4-beta"  # missing comma in C# tupple bug fix,
 
 
 
@@ -92,7 +91,7 @@ dia = (('I', 'ii', 'II', 'iii', 'III', 'IV', 'v', 'V',
        'D',  'Eb', 'E',  'Fb'),  # 6 # enharmonic
        ('Db', 'D',  'Eb', 'E',  'F',  'Gb', 'G',  'Ab',
        'A',  'Bb', 'B',  'C'),   # 5 b
-       ('C#', 'D',  'D#', 'E',  'F',  'F#', 'G',  'G#'
+       ('C#', 'D',  'D#', 'E',  'F',  'F#', 'G',  'G#',
        'A',  'A#', 'B',  'C'),   # 5 b enharmonic
        ('Ab', 'A',  'Bb', 'B',  'C',  'Db', 'D',  'Eb',
        'E',  'F',  'Gb', 'G'),   # 4 b
@@ -270,6 +269,7 @@ def CreateUke():
     # Create the ukulele
     i = capo
     maxCreate = maxFret + 1
+    i = 0
     while i < maxCreate:
         string1[i] = dia[x1][i % 12]
         string2[i] = dia[x2][i % 12]
@@ -863,7 +863,6 @@ if instType == 6:
     print("or enter case sensitive note)?", end=' ')
     x = input() or tuning[5]
     tuning[5] = x
-
 #
 # Start chord entry loop
 #
