@@ -3,7 +3,9 @@
 #  Ver = "v0.2-beta"  # User input poofing,
 #                     # add feature, print to csv shows capo tuning
 #  Ver = "v0.3-beta"  # enharmonic bug fix,
-cM_Ver = "v0.4-beta"  # missing comma in C# tupple bug fix,
+#  Ver = "v0.4-beta"  # missing comma in C# tupple bug fix,
+cM_Ver = "v0.5-beta"  # added banjo drone,
+#                     # abandoned PEP8 80 char line limit for readability
 
 
 
@@ -34,7 +36,7 @@ instruments.
     Type 3: Tenor banjo, Four strings tuned in 5ths. CGDA strings.
             Entries will be checked for +/- 2 semitone limits.
     Type 4: Banjo, five string where 5th string is a drone string independent.
-            gDGBD strings. This does NOT include the drone string in the map.
+            gDGBD strings. v0.5 adds drone sting (does not affect chord shapes).
             Entries will be checked for +/- 2 semitone limits.)
     Type 5: Mandolin, Four strings tuned in 5ths. GDAE strings.
             Entries will be checked for +/- 2 semitone limits.)
@@ -62,6 +64,11 @@ pentNotes = ['', '', '', '', '']
 pentNotesEn = ['', '', '', '', '']
 save2csv = True
 chordName = 'C'
+fifthEntered = 'g'
+droneNote = ['d', 'd#', 'e', 'f', 'f#', 'g',  'g#', 'a', 'a#', 'b',  'c',  'c#']
+droneString = ['', '', '', '', '', '',  '', '', '', '',  '',  '']
+droneCapo = 5  # aka fret 5 (no capo), expected spike 7, 9, 10
+at5 = 'g'
 
 ########################
 # Setup global variables
@@ -71,42 +78,24 @@ fretNumb = ('0', '1', '2', '3', '4', '5', '6', '7',
             '8', '9', '10', '11', '12', '13', '14', '15',
             '16', '17', '18', '19', '20', '21', '22',
             '23', '24', '25', '26', '27', '28')
-dia = (('I', 'ii', 'II', 'iii', 'III', 'IV', 'v', 'V',
-        'vi', 'VI', 'vii', 'VII'),
-       ('C',  'Db', 'D', 'Eb', 'E',  'F',  'Gb', 'G',
-       'Ab', 'A',  'Bb', 'B'),   # 0
-       ('G',  'Ab', 'A', 'Bb', 'B',  'C',  'Db', 'D',
-       'Eb', 'E',  'F',  'F#'),  # 1
-       ('D',  'Eb', 'E', 'F',  'F#', 'G',  'Ab', 'A',
-       'Bb', 'B',  'C',  'C#'),  # 2
-       ('A',  'Bb', 'B', 'C',  'C#', 'D',  'Eb', 'E',
-       'F',  'F#', 'G',  'G#'),  # 3
-       ('E',  'F',  'F#', 'G',  'G#', 'A',  'Bb', 'B',
-       'C',  'C#', 'D',  'D#'),  # 4
-       ('B',  'C',  'C#', 'D',  'D#', 'E',  'F',  'F#',
-       'G',  'G#', 'A',  'A#'),  # 5
-       ('F#', 'G',  'G#', 'A',  'A#', 'B',  'C',  'C#',
-       'D',  'D#', 'E',  'E#'),  # 6
-       ('Gb', 'G',  'Ab', 'A',  'Bb', 'B',  'C',  'Db',
-       'D',  'Eb', 'E',  'Fb'),  # 6 # enharmonic
-       ('Db', 'D',  'Eb', 'E',  'F',  'Gb', 'G',  'Ab',
-       'A',  'Bb', 'B',  'C'),   # 5 b
-       ('C#', 'D',  'D#', 'E',  'F',  'F#', 'G',  'G#',
-       'A',  'A#', 'B',  'C'),   # 5 b enharmonic
-       ('Ab', 'A',  'Bb', 'B',  'C',  'Db', 'D',  'Eb',
-       'E',  'F',  'Gb', 'G'),   # 4 b
-       ('G#', 'A',  'A#', 'B',  'C',  'C#', 'D',  'D#',
-       'E',  'F',  'F#', 'G'),   # 4 b enharmonic
-       ('Eb', 'E',  'F',  'F#', 'G',  'Ab', 'A',  'Bb',
-       'B',  'C',  'C#', 'D'),   # 3 b
-       ('D#', 'E',  'F',  'F#', 'G',  'G#', 'A',  'A#',
-       'B',  'C',  'C#', 'D'),   # 3 b enharmonic
-       ('Bb', 'B',  'C',  'Db', 'D',  'Eb', 'E',  'F',
-       'Gb', 'G',  'Ab', 'A'),   # 2 b
-       ('A#', 'B',  'C',  'C#', 'D',  'D#', 'E',  'F',
-       'F#', 'G',  'G#', 'A'),   # 2 b enharmonic
-       ('F',  'Gb', 'G',  'Ab', 'A',  'Bb', 'B',  'C',
-       'Db', 'D',  'Eb', 'E'))   # 1 b
+dia = (('I', 'ii', 'II', 'iii', 'III', 'IV', 'v', 'V', 'vi', 'VI', 'vii', 'VII'),
+       ('C',  'Db', 'D', 'Eb', 'E',  'F',  'Gb', 'G', 'Ab', 'A',  'Bb', 'B'),
+       ('G',  'Ab', 'A', 'Bb', 'B',  'C',  'Db', 'D', 'Eb', 'E',  'F',  'F#'),
+       ('D',  'Eb', 'E', 'F',  'F#', 'G',  'Ab', 'A', 'Bb', 'B',  'C',  'C#'),
+       ('A',  'Bb', 'B', 'C',  'C#', 'D',  'Eb', 'E', 'F',  'F#', 'G',  'G#'),
+       ('E',  'F',  'F#', 'G',  'G#', 'A',  'Bb', 'B', 'C',  'C#', 'D',  'D#'),
+       ('B',  'C',  'C#', 'D',  'D#', 'E',  'F',  'F#', 'G',  'G#', 'A',  'A#'),
+       ('F#', 'G',  'G#', 'A',  'A#', 'B',  'C',  'C#', 'D',  'D#', 'E',  'E#'),
+       ('Gb', 'G',  'Ab', 'A',  'Bb', 'B',  'C',  'Db', 'D',  'Eb', 'E',  'Fb'),
+       ('Db', 'D',  'Eb', 'E',  'F',  'Gb', 'G',  'Ab', 'A',  'Bb', 'B',  'C'),
+       ('C#', 'D',  'D#', 'E',  'F',  'F#', 'G',  'G#', 'A',  'A#', 'B',  'C'),
+       ('Ab', 'A',  'Bb', 'B',  'C',  'Db', 'D',  'Eb', 'E',  'F',  'Gb', 'G'),
+       ('G#', 'A',  'A#', 'B',  'C',  'C#', 'D',  'D#', 'E',  'F',  'F#', 'G'),
+       ('Eb', 'E',  'F',  'F#', 'G',  'Ab', 'A',  'Bb', 'B',  'C',  'C#', 'D'),
+       ('D#', 'E',  'F',  'F#', 'G',  'G#', 'A',  'A#', 'B',  'C',  'C#', 'D'),
+       ('Bb', 'B',  'C',  'Db', 'D',  'Eb', 'E',  'F', 'Gb', 'G',  'Ab', 'A'),
+       ('A#', 'B',  'C',  'C#', 'D',  'D#', 'E',  'F', 'F#', 'G',  'G#', 'A'),
+       ('F',  'Gb', 'G',  'Ab', 'A',  'Bb', 'B',  'C', 'Db', 'D',  'Eb', 'E'))
 
 enh = (('Db', 'Eb', 'Gb', 'Ab', 'Bb'),
        ('C#', 'D#', 'F#', 'G#', 'A#'))
@@ -163,6 +152,7 @@ def CreateUke():
     global maxFret
     isLegal6 = isLegal5 = isLegal4 = isLegal3 = 0
     isLegal2 = isLegal1 = isLegalAll = 0
+    isLegalDrone = 0
     # Create the ukulele
     x6 = x5 = x4 = x3 = x2 = x1 = 0
     # # Will it break strings of be too floppy?
@@ -219,6 +209,9 @@ def CreateUke():
                     isLegal6 = 1
                 if tuning[4] == legal5[i]:
                     isLegal5 = 1
+            if instType == 4:
+                if fifthEntered.upper() == legal3[i]:
+                    isLegalDrone = 1
             if tuning[3] == legal4[i]:
                 isLegal4 = 1
             if tuning[2] == legal3[i]:
@@ -238,6 +231,10 @@ def CreateUke():
             if isLegal5 == 0:
                 print("WARNING: String 5 (", tuning[4], ") is more", end=' ')
                 print("than +/- 2 from expected:", legal4[3])
+        if instType == 4:
+            if isLegalDrone == 0:
+                print("WARNING: Drone string (", fifthEntered, ") is more", end=' ')
+                print("than +/- 2 from expected:", legal3[3].lower())
         if isLegal4 == 0:
             print("WARNING: String 4 (", tuning[3], ") is more", end=' ')
             print("than +/- 2 from expected:", legal4[3])
@@ -279,6 +276,7 @@ def CreateUke():
             string5[i] = dia[x5][i % 12]
             string6[i] = dia[x6][i % 12]
         i = i + 1
+
 
 def findChordNotes():
     """
@@ -324,6 +322,7 @@ def findChordNotes():
         if chordNotes[3] == enh[1][i]:
             chordNotesEn[3] = enh[0][i]
         i = i + 1
+
 
 def findPentNotes():  # Feature added in v0.3
     """
@@ -390,6 +389,8 @@ def fillChordFretboard():
         if instType == 6:
             cstring6[z] = ' '
             cstring5[z] = ' '
+        if instType == 4:
+            cstring5[z] = ' '
         cstring4[z] = ' '
         cstring3[z] = ' '
         cstring2[z] = ' '
@@ -410,6 +411,11 @@ def fillChordFretboard():
                     cstring5[i] = chordNotes[j]
                 if string5[i] == chordNotesEn[j]:
                     cstring5[i] = chordNotes[j]
+            if instType == 4:
+                string5[i] = ''
+                if i < 12:
+                    string5[i] = droneString[i]
+                    cstring5[i] = droneString[i]
             if string4[i] == chordNotes[j]:
                 cstring4[i] = chordNotes[j]
             if string4[i] == chordNotesEn[j]:
@@ -451,6 +457,8 @@ def fillPentFretboard():
         if instType == 6:
             cstring6[z] = ' '
             cstring5[z] = ' '
+        if instType == 4:
+            cstring5[z] = ' '
         cstring4[z] = ' '
         cstring3[z] = ' '
         cstring2[z] = ' '
@@ -471,6 +479,11 @@ def fillPentFretboard():
                     cstring5[i] = pentNotes[j]
                 if string5[i] == pentNotesEn[j]:
                     cstring5[i] = pentNotes[j]
+            if instType == 4:
+                string5[i] = ' '
+                if i < 12:
+                    string5[i] = droneString[i]
+                    cstring5[i] = droneString[i]
             if string4[i] == pentNotes[j]:
                 cstring4[i] = pentNotes[j]
             if string4[i] == pentNotesEn[j]:
@@ -651,13 +664,39 @@ def printFretboard():
         i = i + 1
     if save2csv is True:
         fn.write("\n")
-        if instType != 6:
+        if instType != 6 and instType != 4:
             print("Results written to", filename)
     else:
         print("")
-        if instType != 6:
+        if instType != 6 and instType != 4:
             print("")
             print("Results NOT written to file")
+
+    if instType == 4:
+        #  Banjo cstring5
+        i = 0
+        if save2csv is True:
+            fn.write("|")
+            fn.write(droneString[droneCapo])
+            fn.write("|")
+        else:
+            print("|", droneString[droneCapo], "|", end=' ')
+        while i < maxCreate:
+            if save2csv is True:
+                fn.write(",")
+                fn.write(cstring5[i])
+            else:
+                print(cstring5[i], end=' ')
+            i = i + 1
+        if save2csv is True:
+            fn.write("\n")
+            if instType == 4:
+                print("Results written to", filename)
+        else:
+            print("")
+            if instType == 4:
+                print("")
+                print("Results NOT written to file")
 
     if instType == 6:
 
@@ -763,7 +802,7 @@ if helpOn is True:
     print("        CGDA is the assumed string set and", end=' ')
     print("entries will be checked for +/- 2 semitone limits.")
     print("Type 4: Banjo, five string where 5th string", end=' ')
-    print("is a drone string and is not shown in the result.")
+    print("is a drone string, shown but does not affect chord shapes.")
     print("        gDGBD is the assumed string set  and", end=' ')
     print("entries will be checked for +/- 2 semitone limits.")
     print("Type 5: Mandolin, Four strings tuned in 5ths.")
@@ -797,13 +836,14 @@ if instType == 3:
     tuning = ['A', 'D', 'G', 'C', '', '']    # CGDA tenor banjo
 if instType == 4:
     tuning = ['D', 'B', 'G', 'D', '', '']    # DGBD banjo
+    droneCapo = 5    # default is no capo
 if instType == 5:
     tuning = ['E', 'A', 'D', 'G', '', '']    # GDAE mandolin
 if instType == 6:
     tuning = ['E', 'B', 'G', 'D', 'A', 'E']  # EADGBE guitar
 
 #
-# capo
+# capos
 #
 if helpOn is True:
     print("")
@@ -811,7 +851,6 @@ if helpOn is True:
     print("number it will be placed at.")
     print("If you are not using a capo, enter 0 or", end=' ')
     print("press 'Enter' with no entry.")
-    print("")
 
 capo = 12
 while capo > 11:
@@ -823,6 +862,99 @@ while capo > 11:
         capo = int(x)
 maxFret = 15 + capo
 
+print("")
+if helpOn is True:
+    if instType == 4:
+        print("Changing the tuning of the drone string is")
+        print("normally only done if you have no capo or spike.")
+        print("")
+
+if instType == 4:
+    fifthEntered = 'g'
+    droneCapo = 5
+    x = 'z'
+    nLoc = 0
+    sa = 0
+    print("Banjo drone string")
+    while x == 'z':
+        print("Change drone string", 'g', "to (enter=no change", end=' ')
+        print("or enter note)?", end=' ')
+        x = input() or 'g'
+        x = x.lower()
+        k = 0
+        i = 0
+        #  ('Db', 'Eb', 'Gb', 'Ab', 'Bb')
+        #  ('C#', 'D#', 'F#', 'G#', 'A#')
+        while i < 5:
+            if x == 'Db' or x == 'db' or x == 'C#':
+                x = 'c#'
+            if x == 'Eb' or x == 'eb' or x == 'D#':
+                x = 'd#'
+            if x == 'Gb' or x == 'gb' or x == 'F#':
+                x = 'f#'
+            if x == 'Ab' or x == 'ab' or x == 'G#':
+                x = 'g#'
+            if x == 'Bb' or x == 'bb' or x == 'A#':
+                x = 'a#'
+            i = i + 1
+        while k < 12:
+            if x == droneNote[k]:
+                nLoc = k
+            k = k + 1
+    fifthentered = x
+    at5 = x
+    #  adjust scale for entered fifthEntered
+    if nLoc != 5:
+        adjVal = nLoc - 5
+        z = 0
+        if adjVal > 0:
+            #  higher pitch
+            zz = adjVal
+            while z < 12:
+                droneString[z] = droneNote[zz % 12]
+                z = z + 1
+                zz = zz + 1
+        else:
+            #  lower pitch
+            zz = (adjVal + 12) % 12
+            while z < 12:
+                droneString[z] = droneNote[zz % 12]
+                z = z + 1
+                zz = zz + 1
+        z = 0
+        while z < 12:
+            droneNote[z] = droneString[z]
+            z = z + 1
+
+    if helpOn is True:
+        if instType == 4:
+            print("")
+            print("Banjo 5th string drone capo or spike fret number.")
+            print("5 = no capo, capoing up 2 = 7 for the 7th fret, etc.")
+            print("")
+
+    x = 12
+    y = 12
+    while x == 12:
+        print("Enter 5th string capo fret number (default is 5=no capo:", end=' ')
+        y = input() or '5'
+        x = int(y)
+        if int(x) < 5 or int(x) > 11:
+            x = 12
+    droneCapo = int(y)
+
+    #  fill droneString
+    i = 0
+    while i < 12:
+        if i == 5:
+            droneString[i] = at5
+        elif i == droneCapo:
+            droneString[i] = droneNote[i]
+        else:
+            droneString[i] = ''
+        i = i + 1
+    print("Banjo drone string end")
+    print("")
 #
 # change tuning?
 #
@@ -919,7 +1051,10 @@ while looping is True:
 #
 # save to csv?
 #
-    if instType == 6:
+    if instType == 4:
+        filename = droneString[droneCapo] + tuning[3]
+        filename = filename + tuning[2] + tuning[1] + tuning[0]
+    elif instType == 6:
         filename = tuning[5] + tuning[4] + tuning[3] + tuning[2]
         filename = filename + tuning[1] + tuning[0]
     else:
