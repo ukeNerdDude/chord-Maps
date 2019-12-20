@@ -7,4 +7,5 @@ v0.4 missing comma in C# tupple bug fix,
 v0.5 added banjo drone, abandoned PEP8 80 char line limit for readability
 v0.6-removed || from file write,
      removed v0.2 frint to csv capo tuning
-v0.7-beta added choice of pentatonic mode
+v0.7-beta added choice of pentatonic mode * chordMaps-work.py is a duplicate of this that should not have been commited
+
