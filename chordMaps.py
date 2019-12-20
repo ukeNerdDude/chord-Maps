@@ -4,10 +4,10 @@
 #                     # add feature, print to csv shows capo tuning
 #  Ver = "v0.3-beta"  # enharmonic bug fix,
 #  Ver = "v0.4-beta"  # missing comma in C# tupple bug fix,
-cM_Ver = "v0.5-beta"  # added banjo drone,
+#  Ver = "v0.5-beta"  # added banjo drone,
 #                     # abandoned PEP8 80 char line limit for readability
-
-
+cM_Ver = "v0.6-beta"  # removed || from file write,
+#                     # removed v0.2 frint to csv capo tuning
 
 """ ChordMaps.py chord map utility for stringed musical instruments.
     Copyright (C) 2019 David Murray
@@ -69,6 +69,8 @@ droneNote = ['d', 'd#', 'e', 'f', 'f#', 'g',  'g#', 'a', 'a#', 'b',  'c',  'c#']
 droneString = ['', '', '', '', '', '',  '', '', '', '',  '',  '']
 droneCapo = 5  # aka fret 5 (no capo), expected spike 7, 9, 10
 at5 = 'g'
+tuning = ['', '', '', '']
+tuningN = ['', '', '', '']
 
 ########################
 # Setup global variables
@@ -549,19 +551,9 @@ def printFretboard():
 
     # cstring1
     if save2csv is True:
-        fn.write("|")
         #  v0.2 show capo'd tuning
-        if capo == 0:
-            fn.write(tuning[0])
-        else:
-            k = 0
-            n = 0
-            while k < len(dia):
-                if tuning[0] == dia[k][0]:
-                    n = k
-                k = k + 1
-            fn.write(str(dia[n][capo]))
-        fn.write("|")
+        #  v0.6 removed showing capo'd tuning
+        fn.write(tuning[0])
     else:  # displa not updated for capo
         print("|", tuning[0], "|", end=' ')
     i = capo
@@ -579,19 +571,9 @@ def printFretboard():
 
     # cstring2
     if save2csv is True:
-        fn.write("|")
         #  v0.2 show capo'd tuning
-        if capo == 0:
-            fn.write(tuning[1])
-        else:
-            k = 0
-            n = 0
-            while k < len(dia):
-                if tuning[1] == dia[k][0]:
-                    n = k
-                k = k + 1
-            fn.write(str(dia[n][capo]))
-        fn.write("|")
+        #  v0.6 removed showing capo'd tuning
+        fn.write(tuning[1])
     else:  # displa not updated for capo
         print("|", tuning[1], "|", end=' ')
     i = capo
@@ -609,19 +591,9 @@ def printFretboard():
 
     # cstring3
     if save2csv is True:
-        fn.write("|")
         #  v0.2 show capo'd tuning
-        if capo == 0:
-            fn.write(tuning[2])
-        else:
-            k = 0
-            n = 0
-            while k < len(dia):
-                if tuning[2] == dia[k][0]:
-                    n = k
-                k = k + 1
-            fn.write(str(dia[n][capo]))
-        fn.write("|")
+        #  v0.6 removed showing capo'd tuning
+        fn.write(tuning[2])
     else:  # displa not updated for capo
         print("|", tuning[2], "|", end=' ')
     i = capo
@@ -639,19 +611,9 @@ def printFretboard():
 
     # cstring4
     if save2csv is True:
-        fn.write("|")
         #  v0.2 show capo'd tuning
-        if capo == 0:
-            fn.write(tuning[3])
-        else:
-            k = 0
-            n = 0
-            while k < len(dia):
-                if tuning[3] == dia[k][0]:
-                    n = k
-                k = k + 1
-            fn.write(str(dia[n][capo]))
-        fn.write("|")
+        #  v0.6 removed showing capo'd tuning
+        fn.write(tuning[3])
     else:  # displa not updated for capo
         print("|", tuning[3], "|", end=' ')
     i = capo
@@ -676,9 +638,7 @@ def printFretboard():
         #  Banjo cstring5
         i = 0
         if save2csv is True:
-            fn.write("|")
             fn.write(droneString[droneCapo])
-            fn.write("|")
         else:
             print("|", droneString[droneCapo], "|", end=' ')
         while i < maxCreate:
@@ -702,19 +662,9 @@ def printFretboard():
 
         # cstring5
         if save2csv is True:
-            fn.write("|")
             #  v0.2 show capo'd tuning
-            if capo == 0:
-                fn.write(tuning[4])
-            else:
-                k = 0
-                n = 0
-                while k < len(dia):
-                    if tuning[4] == dia[k][0]:
-                        n = k
-                    k = k + 1
-                fn.write(str(dia[n][capo]))
-            fn.write("|")
+            #  v0.6 removed showing capo'd tuning
+            fn.write(tuning[4])
         else:  # displa not updated for capo
             print("|", tuning[4], "|", end=' ')
         i = capo
@@ -732,19 +682,8 @@ def printFretboard():
 
         # cstring6
         if save2csv is True:
-            fn.write("|")
             #  v0.2 show capo'd tuning
-            if capo == 0:
-                fn.write(tuning[5])
-            else:
-                k = 0
-                n = 0
-                while k < len(dia):
-                    if tuning[5] == dia[k][0]:
-                        n = k
-                    k = k + 1
-                fn.write(str(dia[n][capo]))
-            fn.write("|")
+            fn.write(tuning[5])
         else:  # displa not updated for capo
             print("|", tuning[5], "|", end=' ')
         i = capo
@@ -765,9 +704,9 @@ def printFretboard():
             print("")
             print("Results NOT written to file")
 
-
+######
 # main
-
+######
 
 print("")
 print("    chordMaps.py  Copyright (C) 2019  David Murray", cM_Ver)
@@ -995,6 +934,8 @@ if instType == 6:
     print("or enter case sensitive note)?", end=' ')
     x = input() or tuning[5]
     tuning[5] = x
+tuningN = tuning
+
 #
 # Start chord entry loop
 #
