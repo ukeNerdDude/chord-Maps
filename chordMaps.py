@@ -6,8 +6,9 @@
 #  Ver = "v0.4-beta"  # missing comma in C# tupple bug fix,
 #  Ver = "v0.5-beta"  # added banjo drone,
 #                     # abandoned PEP8 80 char line limit for readability
-cM_Ver = "v0.6-beta"  # removed || from file write,
+#  Ver = v0.6-beta"  # removed || from file write,
 #                     # removed v0.2 frint to csv capo tuning
+cM_Ver = "v0.7-beta"  # added choice of pentatonic mode
 
 """ ChordMaps.py chord map utility for stringed musical instruments.
     Copyright (C) 2019 David Murray
@@ -60,6 +61,7 @@ chordTonic = 'C'
 chordType = 5  # 0x0 = power, 0x1 = maj, 0x2 = min, 0x4 = 7th, 0x8 = pent
 chordNotes = ['', '', '', '']
 chordNotesEn = ['', '', '', '']  # For fretboard map search
+pent = 2  #
 pentNotes = ['', '', '', '', '']
 pentNotesEn = ['', '', '', '', '']
 save2csv = True
@@ -330,6 +332,7 @@ def findPentNotes():  # Feature added in v0.3
     """
     Finds notes for selected pentatonic scale.
     """
+    global pent
     global pentNotes
     global pentNotesEn
     pentNotesEn = ['', '', '', '', '']
@@ -338,11 +341,38 @@ def findPentNotes():  # Feature added in v0.3
         if dia[i][0] == chordTonic:  # use chordTonic
             x = i
         i = i + 1
-    pentNotes[0] = dia[x][0]
-    pentNotes[1] = dia[x][2]
-    pentNotes[2] = dia[x][4]
-    pentNotes[3] = dia[x][7]
-    pentNotes[4] = dia[x][9]
+    #  anhemitonic (no semitones) pentatonics formed by dropping the
+    #  semitones from the 'from' mode. 'also' overlays
+    if pent == 1:  # blues minor from phrygian, also dorian & aeolian
+        pentNotes[0] = dia[x][0]
+        pentNotes[1] = dia[x][3]
+        pentNotes[2] = dia[x][5]
+        pentNotes[3] = dia[x][7]
+        pentNotes[4] = dia[x][10]
+    if pent == 2:  # major from mixolydian, also lydian & ionian
+        pentNotes[0] = dia[x][0]
+        pentNotes[1] = dia[x][2]
+        pentNotes[2] = dia[x][4]
+        pentNotes[3] = dia[x][7]
+        pentNotes[4] = dia[x][9]
+    if pent == 3:  # appalachian from aeolian, also mixolydian & dorian
+        pentNotes[0] = dia[x][0]
+        pentNotes[1] = dia[x][2]
+        pentNotes[2] = dia[x][5]
+        pentNotes[3] = dia[x][7]
+        pentNotes[4] = dia[x][10]
+    if pent == 4:  # fifthless from locrian, also aeolian & phrygian
+        pentNotes[0] = dia[x][0]
+        pentNotes[1] = dia[x][3]
+        pentNotes[2] = dia[x][5]
+        pentNotes[3] = dia[x][8]
+        pentNotes[4] = dia[x][10]
+    if pent == 5:  # chinese from dorian, also ionian & mixolydian
+        pentNotes[0] = dia[x][0]
+        pentNotes[1] = dia[x][2]
+        pentNotes[2] = dia[x][5]
+        pentNotes[3] = dia[x][7]
+        pentNotes[4] = dia[x][9]
     #
     # Enharmonic alternates
     #
@@ -708,6 +738,7 @@ def printFretboard():
 # main
 ######
 
+
 print("")
 print("    chordMaps.py  Copyright (C) 2019  David Murray", cM_Ver)
 print("    This program comes with ABSOLUTELY NO WARRANTY;")
@@ -979,12 +1010,22 @@ while looping is True:
                 x = input("Add 7th to chord (N or y)?") or 'N'
             if str.upper(x) == 'Y':
                 chordType = chordType | 4
-
     CreateUke()
     if chordType < 8:
         findChordNotes()
         fillChordFretboard()
     else:
+        p = 6
+        pp = 0
+        while p == 6:
+            print("Which mode (1-5)?", end=' ')
+            pp = input() or '6'
+            p = int(pp)
+            if p < 1 or p > 5:
+                p = 6
+            else:
+                p = int(p)
+        pent = p
         findPentNotes()
         fillPentFretboard()
 #    print ("Chord", chordNotes)
@@ -1002,7 +1043,7 @@ while looping is True:
         filename = tuning[3] + tuning[2] + tuning[1] + tuning[0]
     filename = filename + "_" + str(capo) + "_" + chordNotes[0]
     if chordType == 8:
-        filename = filename + "-pent"
+        filename = filename + "-pent" + str(pent)
     else:
         if chordNotes[1] == '':
             filename = filename + '-'
