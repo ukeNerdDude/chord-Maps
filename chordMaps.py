@@ -8,7 +8,11 @@
 #                     # abandoned PEP8 80 char line limit for readability
 #  Ver = v0.6-beta"  # removed || from file write,
 #                     # removed v0.2 frint to csv capo tuning
-cM_Ver = "v0.7-beta"  # added choice of pentatonic mode
+#  Ver = "v0.7-beta"  # added choice of pentatonic mode
+cM_Ver = "v0.8-beta"  # added choice of pentatonic mode
+#  ToDo 1. compact modes with simiar funtions. For now durring beta, leaving
+#          seperate for debugging/fault isolaion purpose
+#       2. complete user input error trapping
 
 """ ChordMaps.py chord map utility for stringed musical instruments.
     Copyright (C) 2019 David Murray
@@ -61,9 +65,15 @@ chordTonic = 'C'
 chordType = 5  # 0x0 = power, 0x1 = maj, 0x2 = min, 0x4 = 7th, 0x8 = pent
 chordNotes = ['', '', '', '']
 chordNotesEn = ['', '', '', '']  # For fretboard map search
-pent = 2  #
+scaleType = 0
+pent = 2  # C&W Major
 pentNotes = ['', '', '', '', '']
 pentNotesEn = ['', '', '', '', '']
+mode = 1  # Ionian
+modalNotes = ['', '', '', '', '', '', '']
+modalNotesEn = ['', '', '', '', '', '', '']
+mtnMnNotes = ['', '', '', '', '', '']
+mtnMnNotesEn = ['', '', '', '', '', '']
 save2csv = True
 chordName = 'C'
 fifthEntered = 'g'
@@ -290,6 +300,7 @@ def findChordNotes():
     global chordNotesEn
     chordNotesEn = ['', '', '', '']
     x = i = 0
+    print("DEBUG: findChordNotes")
     while i < len(dia):
         if dia[i][0] == chordTonic:
             x = i
@@ -328,6 +339,170 @@ def findChordNotes():
         i = i + 1
 
 
+def findModeNotes():
+    """
+    Finds notes of selected diatonic modal scale  # feature added v0.8
+    """
+    global mode
+    global modalNotes
+    global modalNotesEn
+    modalNotesEn = ['', '', '', '', '', '', '']
+    x = i = 0
+    print("DEBUG: findModeNotes")
+    while i < len(dia):
+        if dia[i][0] == chordTonic:  # use chordTonic
+            x = i
+        i = i + 1
+    if mode == 1:  # ionian
+        print("DEBUG: Ionian")
+        modalNotes[0] = dia[x][0]
+        modalNotes[1] = dia[x][2]
+        modalNotes[2] = dia[x][4]
+        modalNotes[3] = dia[x][5]
+        modalNotes[4] = dia[x][7]
+        modalNotes[5] = dia[x][9]
+        modalNotes[6] = dia[x][11]
+    if mode == 2:  # mixolydian
+        print("DEBUG: Mixolydian")
+        modalNotes[0] = dia[x][0]
+        modalNotes[1] = dia[x][2]
+        modalNotes[2] = dia[x][4]
+        modalNotes[3] = dia[x][5]
+        modalNotes[4] = dia[x][7]
+        modalNotes[5] = dia[x][9]
+        modalNotes[6] = dia[x][10]
+    if mode == 3:  # dorian
+        print("DEBUG: Dorian")
+        modalNotes[0] = dia[x][0]
+        modalNotes[1] = dia[x][2]
+        modalNotes[2] = dia[x][3]
+        modalNotes[3] = dia[x][5]
+        modalNotes[4] = dia[x][7]
+        modalNotes[5] = dia[x][9]
+        modalNotes[6] = dia[x][10]
+    if mode == 4:  # aeolian
+        print("DEBUG: Aeolian")
+        modalNotes[0] = dia[x][0]
+        modalNotes[1] = dia[x][2]
+        modalNotes[2] = dia[x][3]
+        modalNotes[3] = dia[x][5]
+        modalNotes[4] = dia[x][7]
+        modalNotes[5] = dia[x][8]
+        modalNotes[6] = dia[x][10]
+    if mode == 5:  # phrygian
+        print("DEBUG: Phrygian")
+        modalNotes[0] = dia[x][0]
+        modalNotes[1] = dia[x][1]
+        modalNotes[2] = dia[x][3]
+        modalNotes[3] = dia[x][5]
+        modalNotes[4] = dia[x][7]
+        modalNotes[5] = dia[x][8]
+        modalNotes[6] = dia[x][10]
+    if mode == 6:  # locrian
+        print("DEBUG: Locrian")
+        modalNotes[0] = dia[x][0]
+        modalNotes[2] = dia[x][1]
+        modalNotes[1] = dia[x][3]
+        modalNotes[3] = dia[x][5]
+        modalNotes[4] = dia[x][6]
+        modalNotes[5] = dia[x][8]
+        modalNotes[6] = dia[x][10]
+    if mode == 7:  # lydian
+        print("DEBUG: Lydian")
+        modalNotes[0] = dia[x][0]
+        modalNotes[1] = dia[x][2]
+        modalNotes[2] = dia[x][4]
+        modalNotes[3] = dia[x][6]
+        modalNotes[4] = dia[x][7]
+        modalNotes[5] = dia[x][9]
+        modalNotes[6] = dia[x][11]
+    #
+    # Enharmonic alternates
+    #
+    i = 0
+    while i < 5:
+        if modalNotes[0] == enh[0][i]:
+            modalNotesEn[0] = enh[1][i]
+        if modalNotes[0] == enh[1][i]:
+            modalNotesEn[0] = enh[0][i]
+        if modalNotes[1] == enh[0][i]:
+            modalNotesEn[1] = enh[1][i]
+        if modalNotes[1] == enh[1][i]:
+            modalNotesEn[1] = enh[0][i]
+        if modalNotes[2] == enh[0][i]:
+            modalNotesEn[2] = enh[1][i]
+        if modalNotes[2] == enh[1][i]:
+            modalNotesEn[2] = enh[0][i]
+        if modalNotes[3] == enh[0][i]:
+            modalNotesEn[3] = enh[1][i]
+        if modalNotes[3] == enh[1][i]:
+            modalNotesEn[3] = enh[0][i]
+        if modalNotes[4] == enh[0][i]:
+            modalNotesEn[4] = enh[1][i]
+        if modalNotes[4] == enh[1][i]:
+            modalNotesEn[4] = enh[0][i]
+        if modalNotes[5] == enh[0][i]:
+            modalNotesEn[5] = enh[1][i]
+        if modalNotes[5] == enh[1][i]:
+            modalNotesEn[5] = enh[0][i]
+        if modalNotes[6] == enh[0][i]:
+            modalNotesEn[6] = enh[1][i]
+        if modalNotes[6] == enh[1][i]:
+            modalNotesEn[6] = enh[0][i]
+        i = i + 1
+
+
+def findMountainMinorNotes():
+    """
+    Finds notes of selected mountain minor scale  # feature added v0.8
+    """
+    global mtnMnNotes
+    global mtnMnNotesEn
+    mtnMnNotesEn = ['', '', '', '', '', '']
+    x = i = 0
+    print("DEBUG: findMountainMinorNotes")
+    while i < len(dia):
+        if dia[i][0] == chordTonic:  # use chordTonic
+            x = i
+        i = i + 1
+    mtnMnNotes[0] = dia[x][0]
+    mtnMnNotes[1] = dia[x][2]
+    mtnMnNotes[2] = dia[x][3]
+    mtnMnNotes[3] = dia[x][5]
+    mtnMnNotes[4] = dia[x][7]
+    mtnMnNotes[5] = dia[x][10]
+    #
+    # Enharmonic alternates
+    #
+    i = 0
+    while i < 5:
+        if mtnMnNotes[0] == enh[0][i]:
+            mtnMnNotesEn[0] = enh[1][i]
+        if mtnMnNotes[0] == enh[1][i]:
+            mtnMnNotesEn[0] = enh[0][i]
+        if mtnMnNotes[1] == enh[0][i]:
+            mtnMnNotesEn[1] = enh[1][i]
+        if mtnMnNotes[1] == enh[1][i]:
+            mtnMnNotesEn[1] = enh[0][i]
+        if mtnMnNotes[2] == enh[0][i]:
+            mtnMnNotesEn[2] = enh[1][i]
+        if mtnMnNotes[2] == enh[1][i]:
+            mtnMnNotesEn[2] = enh[0][i]
+        if mtnMnNotes[3] == enh[0][i]:
+            mtnMnNotesEn[3] = enh[1][i]
+        if mtnMnNotes[3] == enh[1][i]:
+            mtnMnNotesEn[3] = enh[0][i]
+        if mtnMnNotes[4] == enh[0][i]:
+            mtnMnNotesEn[4] = enh[1][i]
+        if mtnMnNotes[4] == enh[1][i]:
+            mtnMnNotesEn[4] = enh[0][i]
+        if mtnMnNotes[5] == enh[0][i]:
+            mtnMnNotesEn[5] = enh[1][i]
+        if mtnMnNotes[5] == enh[1][i]:
+            mtnMnNotesEn[5] = enh[0][i]
+        i = i + 1
+
+
 def findPentNotes():  # Feature added in v0.3
     """
     Finds notes for selected pentatonic scale.
@@ -337,6 +512,7 @@ def findPentNotes():  # Feature added in v0.3
     global pentNotesEn
     pentNotesEn = ['', '', '', '', '']
     x = i = 0
+    print("DEBUG: findPentNotes")
     while i < len(dia):
         if dia[i][0] == chordTonic:  # use chordTonic
             x = i
@@ -416,6 +592,7 @@ def fillChordFretboard():
     #
     # clear Chord Fretboard map
     #
+    print("DEBUG: fillChordFretboard")
     maxCreate = maxFret + 1  # v0.3 missing last col data bug fix
     while z < maxCreate:
         if instType == 6:
@@ -484,6 +661,7 @@ def fillPentFretboard():
     #
     # clear Chord Fretboard map
     #
+    print("DEBUG: fillPentFretboard")
     maxCreate = maxFret + 1  # v0.3 max column bug fix
     while z < maxCreate:
         if instType == 6:
@@ -537,6 +715,144 @@ def fillPentFretboard():
         i = i + 1
 
 
+def fillModalFretboard():
+    """
+    Fills fretboard array with notes for selected modal scale.
+    """
+    global maxFret
+    global cstring6
+    global cstring5
+    global cstring4
+    global cstring3
+    global cstring2
+    global cstring1
+    i = j = k = z = 0
+    #
+    # clear Fretboard map
+    #
+    print("DEBUG: fillModalFretboard")
+    maxCreate = maxFret + 1
+    while z < maxCreate:
+        if instType == 6:
+            cstring6[z] = ' '
+            cstring5[z] = ' '
+        if instType == 4:
+            cstring5[z] = ' '
+        cstring4[z] = ' '
+        cstring3[z] = ' '
+        cstring2[z] = ' '
+        cstring1[z] = ' '
+        z = z + 1
+    #
+    # Build map
+    #
+    i = capo
+    while i < maxCreate:
+        while j < len(modalNotes):
+            if instType == 6:
+                if string6[i] == modalNotes[j]:
+                    cstring6[i] = modalNotes[j]
+                if string6[i] == modalNotesEn[j]:
+                    cstring6[i] = modalNotes[j]
+                if string5[i] == modalNotes[j]:
+                    cstring5[i] = modalNotes[j]
+                if string5[i] == modalNotesEn[j]:
+                    cstring5[i] = modalNotes[j]
+            if instType == 4:
+                string5[i] = ' '
+                if i < 12:
+                    string5[i] = droneString[i]
+                    cstring5[i] = droneString[i]
+            if string4[i] == modalNotes[j]:
+                cstring4[i] = modalNotes[j]
+            if string4[i] == modalNotesEn[j]:
+                cstring4[i] = modalNotes[j]
+            if string3[i] == modalNotes[j]:
+                cstring3[i] = modalNotes[j]
+            if string3[i] == modalNotesEn[j]:
+                cstring3[i] = modalNotes[j]
+            if string2[i] == modalNotes[j]:
+                cstring2[i] = modalNotes[j]
+            if string2[i] == modalNotesEn[j]:
+                cstring2[i] = modalNotes[j]
+            if string1[i] == modalNotes[j]:
+                cstring1[i] = modalNotes[j]
+            if string1[i] == modalNotesEn[j]:
+                cstring1[i] = modalNotes[j]
+            j = j + 1
+        j = 0
+        i = i + 1
+
+
+def fillMtnMnFretboard():
+    """
+    Fills fretboard array with notes for selected modal scale.
+    """
+    global maxFret
+    global cstring6
+    global cstring5
+    global cstring4
+    global cstring3
+    global cstring2
+    global cstring1
+    i = j = k = z = 0
+    #
+    # clear Fretboard map
+    #
+    print("DEBUG: fillMtnMnFretboard")
+    maxCreate = maxFret + 1
+    while z < maxCreate:
+        if instType == 6:
+            cstring6[z] = ' '
+            cstring5[z] = ' '
+        if instType == 4:
+            cstring5[z] = ' '
+        cstring4[z] = ' '
+        cstring3[z] = ' '
+        cstring2[z] = ' '
+        cstring1[z] = ' '
+        z = z + 1
+    #
+    # Build map
+    #
+    i = capo
+    while i < maxCreate:
+        while j < len(mtnMnNotes):
+            if instType == 6:
+                if string6[i] == mtnMnNotes[j]:
+                    cstring6[i] = mtnMnNotes[j]
+                if string6[i] == mtnMnNotesEn[j]:
+                    cstring6[i] = mtnMnNotes[j]
+                if string5[i] == mtnMnNotes[j]:
+                    cstring5[i] = mtnMnNotes[j]
+                if string5[i] == mtnMnNotesEn[j]:
+                    cstring5[i] = mtnMnNotes[j]
+            if instType == 4:
+                string5[i] = ' '
+                if i < 12:
+                    string5[i] = droneString[i]
+                    cstring5[i] = droneString[i]
+            if string4[i] == mtnMnNotes[j]:
+                cstring4[i] = mtnMnNotes[j]
+            if string4[i] == mtnMnNotesEn[j]:
+                cstring4[i] = mtnMnNotes[j]
+            if string3[i] == mtnMnNotes[j]:
+                cstring3[i] = mtnMnNotes[j]
+            if string3[i] == mtnMnNotesEn[j]:
+                cstring3[i] = mtnMnNotes[j]
+            if string2[i] == mtnMnNotes[j]:
+                cstring2[i] = mtnMnNotes[j]
+            if string2[i] == mtnMnNotesEn[j]:
+                cstring2[i] = mtnMnNotes[j]
+            if string1[i] == mtnMnNotes[j]:
+                cstring1[i] = mtnMnNotes[j]
+            if string1[i] == mtnMnNotesEn[j]:
+                cstring1[i] = mtnMnNotes[j]
+            j = j + 1
+        j = 0
+        i = i + 1
+
+
 def printFretboard():
     """
     Writes the chord fretboard to a comman delimited file
@@ -545,6 +861,7 @@ def printFretboard():
     global maxFret
     global chordName
     global chordType
+    global scaleType
     if save2csv is True:
         fn = open(filename, "w")
     maxCreate = maxFret + 1
@@ -989,12 +1306,12 @@ while looping is True:
     if helpOn is True:
         print("")
         print("Major=1-M3-5, minor=1-b3-5, power chord=1-5 (no 3rd,", end=' ')
-        print("neither major or minor), pent=pentatonic scale.")
+        print("neither major or minor), scale=select a scale scale.")
         print("")
 
     chordType = 9
     while chordType == 9:
-        print("Chord type (0=pwr chord, 1=major, 2=minor, 8=pent)?", end=' ')
+        print("Chord type (0=pwr chord, 1=major, 2=minor, 8=scale)?", end=' ')
         x = input() or '9'
         chordType = int(x)
         if chordType != 0 and chordType != 1 and chordType != 2 and chordType != 8:
@@ -1015,20 +1332,37 @@ while looping is True:
         findChordNotes()
         fillChordFretboard()
     else:
-        p = 6
-        pp = 0
-        while p == 6:
-            print("Which mode (1-5)?", end=' ')
-            pp = input() or '6'
-            p = int(pp)
-            if p < 1 or p > 5:
-                p = 6
+        whatScale = 14
+        zzz = ''
+        if helpOn is True:
+            print("")
+            print("Pentatonic modes are anhemitonic modes 1-5")
+            print("Diatonic modes are Ionian, Mixolydian, Dorian, etc.")
+            print("Mountain Minor is the old-time I, II, bIII, IV, V, bVII scale")
+            print("")
+        while whatScale == 14:
+            print("1=Pent 1, 2=pent 2, 3=pent 3, 4=pent 4, 5=pent 5")
+            print("6=Ionian, 7=Mixolydian, 8=Dorian, 9=Aeolian")
+            print("10=Phtygian, 11=Locrian, 12=Lydian, 13=Mountain Minor")
+            print("Enter the scale want", end=' ')
+            zzz = input()
+            whatScale = int(zzz)
+            if whatScale < 1 or whatScale > 13:
+                whatScale = 14
             else:
-                p = int(p)
-        pent = p
-        findPentNotes()
-        fillPentFretboard()
-#    print ("Chord", chordNotes)
+                scaleType = whatScale
+        if whatScale < 6:
+            pent = whatScale
+            findPentNotes()
+            fillPentFretboard()
+        elif whatScale == 13:
+            findMountainMinorNotes()
+            fillMtnMnFretboard()
+        else:
+            mode = whatScale - 5
+            findModeNotes()
+            fillModalFretboard()
+
 
 #
 # save to csv?
@@ -1043,7 +1377,24 @@ while looping is True:
         filename = tuning[3] + tuning[2] + tuning[1] + tuning[0]
     filename = filename + "_" + str(capo) + "_" + chordNotes[0]
     if chordType == 8:
-        filename = filename + "-pent" + str(pent)
+        if scaleType < 6:
+            filename = filename + "-pent" + str(pent)
+        if scaleType == 6:
+            filename = filename + "-ion"
+        if scaleType == 7:
+            filename = filename + "-mix"
+        if scaleType == 8:
+            filename = filename + "-dor"
+        if scaleType == 9:
+            filename = filename + "-aeo"
+        if scaleType == 10:
+            filename = filename + "-phy"
+        if scaleType == 11:
+            filename = filename + "-loc"
+        if scaleType == 12:
+            filename = filename + "-lyd"
+        if scaleType == 13:
+            filename = filename + "-mtnMn"
     else:
         if chordNotes[1] == '':
             filename = filename + '-'
