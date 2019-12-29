@@ -9,7 +9,8 @@
 #  Ver = v0.6-beta"  # removed || from file write,
 #                     # removed v0.2 frint to csv capo tuning
 #  Ver = "v0.7-beta"  # added choice of pentatonic mode
-cM_Ver = "v0.8-beta"  # added choice of pentatonic mode
+#  Ver = "v0.8-beta"  # added choice of scales
+cM_Ver = "v0.9-beta"  # removed debug print statements (hase makes waste)
 #  ToDo 1. compact modes with simiar funtions. For now durring beta, leaving
 #          seperate for debugging/fault isolaion purpose
 #       2. complete user input error trapping
@@ -300,7 +301,6 @@ def findChordNotes():
     global chordNotesEn
     chordNotesEn = ['', '', '', '']
     x = i = 0
-    print("DEBUG: findChordNotes")
     while i < len(dia):
         if dia[i][0] == chordTonic:
             x = i
@@ -348,13 +348,11 @@ def findModeNotes():
     global modalNotesEn
     modalNotesEn = ['', '', '', '', '', '', '']
     x = i = 0
-    print("DEBUG: findModeNotes")
     while i < len(dia):
         if dia[i][0] == chordTonic:  # use chordTonic
             x = i
         i = i + 1
     if mode == 1:  # ionian
-        print("DEBUG: Ionian")
         modalNotes[0] = dia[x][0]
         modalNotes[1] = dia[x][2]
         modalNotes[2] = dia[x][4]
@@ -363,7 +361,6 @@ def findModeNotes():
         modalNotes[5] = dia[x][9]
         modalNotes[6] = dia[x][11]
     if mode == 2:  # mixolydian
-        print("DEBUG: Mixolydian")
         modalNotes[0] = dia[x][0]
         modalNotes[1] = dia[x][2]
         modalNotes[2] = dia[x][4]
@@ -372,7 +369,6 @@ def findModeNotes():
         modalNotes[5] = dia[x][9]
         modalNotes[6] = dia[x][10]
     if mode == 3:  # dorian
-        print("DEBUG: Dorian")
         modalNotes[0] = dia[x][0]
         modalNotes[1] = dia[x][2]
         modalNotes[2] = dia[x][3]
@@ -381,7 +377,6 @@ def findModeNotes():
         modalNotes[5] = dia[x][9]
         modalNotes[6] = dia[x][10]
     if mode == 4:  # aeolian
-        print("DEBUG: Aeolian")
         modalNotes[0] = dia[x][0]
         modalNotes[1] = dia[x][2]
         modalNotes[2] = dia[x][3]
@@ -390,7 +385,6 @@ def findModeNotes():
         modalNotes[5] = dia[x][8]
         modalNotes[6] = dia[x][10]
     if mode == 5:  # phrygian
-        print("DEBUG: Phrygian")
         modalNotes[0] = dia[x][0]
         modalNotes[1] = dia[x][1]
         modalNotes[2] = dia[x][3]
@@ -399,7 +393,6 @@ def findModeNotes():
         modalNotes[5] = dia[x][8]
         modalNotes[6] = dia[x][10]
     if mode == 6:  # locrian
-        print("DEBUG: Locrian")
         modalNotes[0] = dia[x][0]
         modalNotes[2] = dia[x][1]
         modalNotes[1] = dia[x][3]
@@ -408,7 +401,6 @@ def findModeNotes():
         modalNotes[5] = dia[x][8]
         modalNotes[6] = dia[x][10]
     if mode == 7:  # lydian
-        print("DEBUG: Lydian")
         modalNotes[0] = dia[x][0]
         modalNotes[1] = dia[x][2]
         modalNotes[2] = dia[x][4]
@@ -460,7 +452,6 @@ def findMountainMinorNotes():
     global mtnMnNotesEn
     mtnMnNotesEn = ['', '', '', '', '', '']
     x = i = 0
-    print("DEBUG: findMountainMinorNotes")
     while i < len(dia):
         if dia[i][0] == chordTonic:  # use chordTonic
             x = i
@@ -512,7 +503,6 @@ def findPentNotes():  # Feature added in v0.3
     global pentNotesEn
     pentNotesEn = ['', '', '', '', '']
     x = i = 0
-    print("DEBUG: findPentNotes")
     while i < len(dia):
         if dia[i][0] == chordTonic:  # use chordTonic
             x = i
@@ -592,7 +582,6 @@ def fillChordFretboard():
     #
     # clear Chord Fretboard map
     #
-    print("DEBUG: fillChordFretboard")
     maxCreate = maxFret + 1  # v0.3 missing last col data bug fix
     while z < maxCreate:
         if instType == 6:
@@ -661,7 +650,6 @@ def fillPentFretboard():
     #
     # clear Chord Fretboard map
     #
-    print("DEBUG: fillPentFretboard")
     maxCreate = maxFret + 1  # v0.3 max column bug fix
     while z < maxCreate:
         if instType == 6:
@@ -730,7 +718,6 @@ def fillModalFretboard():
     #
     # clear Fretboard map
     #
-    print("DEBUG: fillModalFretboard")
     maxCreate = maxFret + 1
     while z < maxCreate:
         if instType == 6:
@@ -799,7 +786,6 @@ def fillMtnMnFretboard():
     #
     # clear Fretboard map
     #
-    print("DEBUG: fillMtnMnFretboard")
     maxCreate = maxFret + 1
     while z < maxCreate:
         if instType == 6:
