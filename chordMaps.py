@@ -6,14 +6,13 @@
 #  Ver = "v0.4-beta"  # missing comma in C# tupple bug fix,
 #  Ver = "v0.5-beta"  # added banjo drone,
 #                     # abandoned PEP8 80 char line limit for readability
-#  Ver = v0.6-beta"  # removed || from file write,
+#  Ver = v0.6-beta"   # removed || from file write,
 #                     # removed v0.2 frint to csv capo tuning
 #  Ver = "v0.7-beta"  # added choice of pentatonic mode
 #  Ver = "v0.8-beta"  # added choice of scales
-cM_Ver = "v0.9-beta"  # removed debug print statements (hase makes waste)
-#  ToDo 1. compact modes with simiar funtions. For now durring beta, leaving
-#          seperate for debugging/fault isolaion purpose
-#       2. complete user input error trapping
+#  Ver = v0.9-beta    # removed debug print statements (hase makes waste)
+cM_Ver = "v0.10-beta"  # adding some more user input error checking
+#                      # this may be the last beta release
 
 """ ChordMaps.py chord map utility for stringed musical instruments.
     Copyright (C) 2019 David Murray
@@ -337,6 +336,18 @@ def findChordNotes():
         if chordNotes[3] == enh[1][i]:
             chordNotesEn[3] = enh[0][i]
         i = i + 1
+
+
+def isItOK(entry):
+    isOK = False
+    i = 0
+    refNotes = ['C',  'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#',
+                'Gb', 'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B', 'Cb']
+    while i < len(refNotes):
+        if entry == refNotes[i]:
+            isOK = True
+        i = i + 1
+    return isOK
 
 
 def findModeNotes():
@@ -1148,7 +1159,6 @@ if instType == 4:
     x = 'z'
     nLoc = 0
     sa = 0
-    print("Banjo drone string")
     while x == 'z':
         print("Change drone string", 'g', "to (enter=no change", end=' ')
         print("or enter note)?", end=' ')
@@ -1174,6 +1184,8 @@ if instType == 4:
             if x == droneNote[k]:
                 nLoc = k
             k = k + 1
+        if nLoc == 0:
+            x = 'z'
     fifthentered = x
     at5 = x
     #  adjust scale for entered fifthEntered
@@ -1211,6 +1223,8 @@ if instType == 4:
     while x == 12:
         print("Enter 5th string capo fret number (default is 5=no capo:", end=' ')
         y = input() or '5'
+        if y.isalpha():  # added in v0.10
+            y = int('12')
         x = int(y)
         if int(x) < 5 or int(x) > 11:
             x = 12
@@ -1226,7 +1240,6 @@ if instType == 4:
         else:
             droneString[i] = ''
         i = i + 1
-    print("Banjo drone string end")
     print("")
 #
 # change tuning?
@@ -1243,30 +1256,48 @@ if helpOn is True:
 
 CreateUke()  # 1st call
 
-print("Change string 1", tuning[0], "to (enter=no change", end=' ')
-print("or enter case sensitive note)?", end=' ')
-x = input() or tuning[0]
+zz = False
+while zz is False:
+    print("Change string 1", tuning[0], "to (enter=no change", end=' ')
+    print("or enter case sensitive note)?", end=' ')
+    x = input() or tuning[0]
+    zz = isItOK(x)
 tuning[0] = x
-print("Change string 2", tuning[1], "to (enter=no change", end=' ')
-print("or enter case sensitive note)?", end=' ')
-x = input() or tuning[1]
+zz = False
+while zz is False:
+    print("Change string 2", tuning[1], "to (enter=no change", end=' ')
+    print("or enter case sensitive note)?", end=' ')
+    x = input() or tuning[1]
+    zz = isItOK(x)
 tuning[1] = x
-print("Change string 3", tuning[2], "to (enter=no change", end=' ')
-print("or enter case sensitive note)?", end=' ')
-x = input() or tuning[2]
+zz = False
+while zz is False:
+    print("Change string 3", tuning[2], "to (enter=no change", end=' ')
+    print("or enter case sensitive note)?", end=' ')
+    x = input() or tuning[2]
+    zz = isItOK(x)
 tuning[2] = x
-print("Change string 4", tuning[3], "to (enter=no change", end=' ')
-print("or enter case sensitive note)?", end=' ')
-x = input() or tuning[3]
+zz = False
+while zz is False:
+    print("Change string 4", tuning[3], "to (enter=no change", end=' ')
+    print("or enter case sensitive note)?", end=' ')
+    x = input() or tuning[3]
+    zz = isItOK(x)
 tuning[3] = x
 if instType == 6:
-    print("Change string 5", tuning[4], "to (enter=no change", end=' ')
-    print("or enter case sensitive note)?", end=' ')
-    x = input() or tuning[4]
+    zz = False
+    while zz is False:
+        print("Change string 5", tuning[4], "to (enter=no change", end=' ')
+        print("or enter case sensitive note)?", end=' ')
+        x = input() or tuning[4]
+        zz = isItOK(x)
     tuning[4] = x
-    print("Change string 6", tuning[5], "to (enter=no change", end=' ')
-    print("or enter case sensitive note)?", end=' ')
-    x = input() or tuning[5]
+    zz = False
+    while zz is False:
+        print("Change string 6", tuning[5], "to (enter=no change", end=' ')
+        print("or enter case sensitive note)?", end=' ')
+        x = input() or tuning[5]
+        zz = isItOK(x)
     tuning[5] = x
 tuningN = tuning
 
@@ -1282,9 +1313,12 @@ while looping is True:
         print("")
 
     chordTonic = 'z'
-    while chordTonic == 'z':
+    zz = False
+    while chordTonic == 'z' or zz is False:
         x = input("Chord tonic/root note (case sensitive)?") or 'z'
-        chordTonic = x
+        zz = isItOK(x)
+        if zz is True:
+            chordTonic = x
     chordNotes[0] = chordTonic  # this is for pentatonic
 #
 # chord type
@@ -1297,10 +1331,10 @@ while looping is True:
 
     chordType = 9
     while chordType == 9:
-        print("Chord type (0=pwr chord, 1=major, 2=minor, 8=scale)?", end=' ')
+        print("Chord type (1=major, 2=minor, 8=scale)?", end=' ')
         x = input() or '9'
         chordType = int(x)
-        if chordType != 0 and chordType != 1 and chordType != 2 and chordType != 8:
+        if chordType != 1 and chordType != 2 and chordType != 8:
             chordType = 9
     if chordType != 8:
         if chordType != 0:
@@ -1330,7 +1364,7 @@ while looping is True:
             print("1=Pent 1, 2=pent 2, 3=pent 3, 4=pent 4, 5=pent 5")
             print("6=Ionian, 7=Mixolydian, 8=Dorian, 9=Aeolian")
             print("10=Phtygian, 11=Locrian, 12=Lydian, 13=Mountain Minor")
-            print("Enter the scale want", end=' ')
+            print("Enter the scale wanted:", end=' ')
             zzz = input()
             whatScale = int(zzz)
             if whatScale < 1 or whatScale > 13:
